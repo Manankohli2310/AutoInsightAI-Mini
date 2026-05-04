@@ -4,60 +4,88 @@ import numpy as np
 class CoreAnalyzer:
     def __init__(self, df):
         self.df = df
-        self.insights = []
+        self.schema = self._identify_schema()
+        self.stats_snapshot = self._generate_snapshot()
+        self.ranked_numeric = self._rank_numeric_features()
+
+    def _identify_schema(self):
+        """Semantic detection of IDs vs actual metrics."""
+        schema = {"id": [], "numeric": [], "categorical": [], "datetime": []}
+        for col in self.df.columns:
+            # Datetime check
+            if pd.api.types.is_datetime64_any_dtype(self.df[col]) or "date" in col.lower():
+                schema["datetime"].append(col)
+                continue
+            
+            # ID check (High uniqueness ratio)
+            unique_ratio = self.df[col].nunique() / len(self.df)
+            if unique_ratio > 0.85 and not pd.api.types.is_float_dtype(self.df[col]):
+                schema["id"].append(col)
+                continue
+
+            # Numeric vs Categorical
+            if pd.api.types.is_numeric_dtype(self.df[col]):
+                schema["numeric"].append(col)
+            else:
+                schema["categorical"].append(col)
+        return schema
+
+    def _generate_snapshot(self):
+        """JSON-Safe statistical fingerprint."""
+        snapshot = {}
+        for col in self.schema["numeric"]:
+            # CRITICAL FIX: Cast every value to float() to avoid NumPy JSON errors
+            snapshot[col] = {
+                "mean": float(round(self.df[col].mean(), 2)),
+                "median": float(round(self.df[col].median(), 2)),
+                "std": float(round(self.df[col].std(), 2)),
+                "min": float(round(self.df[col].min(), 2)),
+                "max": float(round(self.df[col].max(), 2)),
+                "skew": float(round(self.df[col].skew(), 2))
+            }
+        return snapshot
+
+    def _rank_numeric_features(self):
+        """Ranks features by variation and skewness."""
+        scores = {}
+        for col in self.schema["numeric"]:
+            mean_val = self.df[col].mean()
+            cv = abs(self.df[col].std() / mean_val) if mean_val != 0 else 0
+            skew = abs(self.df[col].skew())
+            scores[col] = float(cv + skew)
+        return sorted(scores, key=scores.get, reverse=True)
 
     def get_basic_info(self):
         return {
             "total_rows": int(self.df.shape[0]),
             "total_columns": int(self.df.shape[1]),
-            "column_list": self.df.columns.tolist(),
-            "numerical_columns": self.df.select_dtypes(include=[np.number]).columns.tolist(),
-            "categorical_columns": self.df.select_dtypes(include=['object']).columns.tolist()
+            "column_list": self.df.columns.tolist(), # Required by AI Engine
+            "schema": self.schema
         }
 
     def generate_insights(self):
         self.insights = []
-        df = self.df
-        num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        cat_cols = df.select_dtypes(include=['object']).columns.tolist()
+        # Insight 1: Scale
+        self.insights.append(f"Analysis focused on **{len(self.schema['numeric'])}** metrics after filtering ID columns.")
+        
+        # Insight 2: High Volatility (Ranked)
+        for col in self.ranked_numeric[:2]:
+            self.insights.append(f"Detected significant fluctuations in **{col}**, indicating diverse data behavior.")
 
-        # 1. Dataset Scale
-        self.insights.append(f"Analysis complete for **{df.shape[0]}** records across **{df.shape[1]}** variables.")
-
-        # 2. Automated Date Detection
-        date_col = next((col for col in df.columns if 'date' in col.lower() or 'year' in col.lower()), None)
-        if date_col:
-            try:
-                temp_date = pd.to_datetime(df[date_col], errors='coerce')
-                self.insights.append(f"Data timeline spans from **{temp_date.min().year}** to **{temp_date.max().year}**.")
-            except: pass
-
-        # 3. Variability & Outliers (Numeric)
-        for col in num_cols[:3]: # Limit to top 3 numeric columns
-            cv = df[col].std() / df[col].mean() if df[col].mean() != 0 else 0
-            if cv > 0.5:
-                self.insights.append(f"Column **{col}** shows high variability (CV: {round(cv,2)}), suggesting diverse data points.")
-            
-            # Outlier detection
-            q1, q3 = df[col].quantile(0.25), df[col].quantile(0.75)
-            outliers = len(df[(df[col] < q1 - 1.5*(q3-q1)) | (df[col] > q3 + 1.5*(q3-q1))])
+        # Insight 3: Outliers
+        for col in self.ranked_numeric[:2]:
+            q1, q3 = self.df[col].quantile(0.25), self.df[col].quantile(0.75)
+            iqr = q3 - q1
+            outliers = len(self.df[(self.df[col] < q1 - 1.5*iqr) | (self.df[col] > q3 + 1.5*iqr)])
             if outliers > 0:
-                self.insights.append(f"Detected **{outliers}** unusual outliers in **{col}** that deviate from the normal average.")
+                self.insights.append(f"Found **{outliers} outliers** in {col} that deviate from the statistical norm.")
 
-        # 4. Categorical Dominance
-        for col in cat_cols[:2]:
-            top_val = df[col].mode()[0]
-            perc = (df[col].value_counts().max() / len(df)) * 100
-            self.insights.append(f"In **{col}**, the category '**{top_val}**' is most frequent ({round(perc,1)}% of data).")
-
-        # 5. Correlations
-        if len(num_cols) >= 2:
-            corr = df[num_cols].corr()
-            for i in range(len(num_cols)):
-                for j in range(i+1, len(num_cols)):
-                    val = corr.iloc[i, j]
-                    if abs(val) > 0.4:
-                        rel = "positive" if val > 0 else "negative"
-                        self.insights.append(f"Found a **{rel} relationship** ({round(val,2)}) between **{num_cols[i]}** and **{num_cols[j]}**.")
+        # Insight 4: Strongest Correlation
+        if len(self.schema["numeric"]) >= 2:
+            corr = self.df[self.schema["numeric"]].corr().stack().reset_index()
+            corr = corr[corr['level_0'] != corr['level_1']]
+            top = corr.sort_values(0, ascending=False).head(1)
+            if not top.empty:
+                self.insights.append(f"Strongest pattern: **{top.iloc[0]['level_0']}** and **{top.iloc[0]['level_1']}** move together.")
 
         return self.insights

@@ -3,38 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoInsight AI | Dual-Engine Analyzer</title>
+    <title>AutoInsight AI | Dual-Engine Data Analyzer</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
+        <!-- Header Section -->
         <header class="main-header">
-            <div class="logo">🚀 AutoInsight <span class="ai-badge">AI</span></div>
+            <div class="logo">
+                <span class="icon">🚀</span>
+                <h3>AutoInsight <span class="ai-badge">AI</span></h3>
+            </div>
             <div class="engine-selector">
                 <button class="toggle-btn" id="btnV1">Core Engine (V1)</button>
                 <button class="toggle-btn active" id="btnV2">AI-Assisted (V2)</button>
             </div>
         </header>
 
+        <!-- Upload Section -->
         <section class="upload-area">
-            <div class="drop-zone">
-                <h2>Upload Dataset</h2>
+            <div class="drop-zone" id="dropZone">
+                <h3>Step 1: Upload Dataset</h3>
+                <p>Drag & drop your CSV or Excel file here (Max 10MB)</p>
                 <input type="file" id="fileInput" hidden accept=".csv, .xlsx">
                 <button class="primary-btn" onclick="document.getElementById('fileInput').click()">Browse Files</button>
                 <p id="fileNameDisplay" class="file-name">No file selected</p>
-                <button class="analyze-btn" onclick="uploadFile()">Run Deep Analysis</button>
+                
+                <div class="action-buttons">
+                    <button class="analyze-btn" id="analyzeBtn" onclick="uploadFile()">Run Deep Analysis</button>
+                    <!-- Download button will be injected here by JS -->
+                </div>
             </div>
         </section>
 
-        <!-- SKELETON LOADER (Kept exactly as you liked it) -->
+        <!-- Loading State with Skeleton UI -->
         <div id="loading" class="loader-container" style="display:none;">
             <div class="spinner"></div>
-            <h2 id="loadingText">ANALYZING...</h2>
+            <h2 id="loadingText">CRUNCHING DATA...</h2>
+            
             <div class="skeleton-stats">
                 <div class="skeleton sk-stat-card"></div>
                 <div class="skeleton sk-stat-card"></div>
                 <div class="skeleton sk-stat-card"></div>
             </div>
+            
             <div class="skeleton-main">
                 <div class="skeleton sk-insights"></div>
                 <div class="visuals-side">
@@ -44,25 +57,38 @@
             </div>
         </div>
 
-        <!-- DASHBOARD RESULT -->
+        <!-- Dashboard Result -->
         <main id="dashboard" class="dashboard-content" style="display:none;">
+            <!-- Summary Stats -->
             <div class="stats-grid">
-                <div class="stat-card"><span class="label">Total Rows</span><h2 id="statRows">-</h2></div>
-                <div class="stat-card"><span class="label">Columns Found</span><h2 id="statCols">-</h2></div>
-                <div class="stat-card"><span class="label">Data Health</span><h2 id="statStatus">-</h2></div>
+                <div class="stat-card">
+                    <span class="label">Total Rows</span>
+                    <h2 id="statRows">-</h2>
+                </div>
+                <div class="stat-card">
+                    <span class="label">Columns Found</span>
+                    <h2 id="statCols">-</h2>
+                </div>
+                <div class="stat-card">
+                    <span class="label">Analysis Status</span>
+                    <h2 id="statStatus">-</h2>
+                </div>
             </div>
 
             <div class="main-grid">
+                <!-- Insights Side -->
                 <div class="card insights-side">
                     <div class="card-header"><h3>💡 Intelligence Insights</h3></div>
+                    
                     <div id="aiSummaryBox" class="ai-box" style="display:none;">
                         <h4>🤖 AI Executive Summary</h4>
                         <p id="aiSummaryText"></p>
                     </div>
+
                     <ul id="insightsList"></ul>
                 </div>
 
-                <!-- THIS IS THE FIX: This div is empty. JS will build cards here. -->
+                <!-- Visuals Side: Empty for dynamic JS injection -->
                 <div class="visuals-side" id="visualsContainer"></div>
             </div>
         </main>

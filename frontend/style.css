@@ -1,5 +1,5 @@
 :root {
-    /* New Black Neon Palette */
+    /* Cyber-Black Neon Palette */
     --bg-color: #050505;       /* Deep Pitch Black */
     --card-bg: #111111;       /* Darkest Grey */
     --border-color: #222222;   /* Subtle Border */
@@ -15,6 +15,7 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 .app-container {
@@ -23,7 +24,7 @@ body {
     padding: 2rem;
 }
 
-/* Header & Toggle */
+/* --- HEADER & ENGINE SELECTOR --- */
 .main-header {
     display: flex;
     justify-content: space-between;
@@ -37,11 +38,11 @@ body {
     gap: 10px;
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--accent); /* Yellow Logo */
+    color: var(--accent);
 }
 
 .ai-badge {
-    background: var(--primary); /* Orange Badge */
+    background: var(--primary);
     color: #000;
     padding: 2px 8px;
     border-radius: 4px;
@@ -71,10 +72,10 @@ body {
 .toggle-btn.active {
     background: var(--primary);
     color: #000;
-    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4); /* Orange Glow */
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
 }
 
-/* Upload Area */
+/* --- UPLOAD SECTION --- */
 .upload-area .drop-zone {
     background: var(--card-bg);
     border: 2px dashed #ffc4009c;
@@ -85,7 +86,7 @@ body {
 }
 
 .upload-area .drop-zone:hover {
-    border-color: var(--accent); /* Yellow on Hover */
+    border-color: var(--accent);
 }
 
 .primary-btn {
@@ -103,11 +104,11 @@ body {
 .primary-btn:hover {
     background: var(--accent);
     color: #000;
-    box-shadow: 0 0 20px rgba(243, 255, 0, 0.5); /* Yellow Glow */
+    box-shadow: 0 0 20px rgba(243, 255, 0, 0.5);
 }
 
 .analyze-btn {
-    background: linear-gradient(90deg, var(--primary), var(--accent)); /* Orange to Yellow */
+    background: linear-gradient(90deg, var(--primary), var(--accent));
     border: none;
     color: #000;
     padding: 14px 40px;
@@ -126,13 +127,24 @@ body {
     box-shadow: 0 8px 25px rgba(255, 102, 0, 0.5);
 }
 
+/* New Style forjected Download Button */
+#downloadBtn {
+    background: var(--accent);
+    color: #000;
+    margin-left: 10px;
+}
+
+#downloadBtn:hover {
+    box-shadow: 0 0 20px rgba(255, 196, 0, 0.6);
+}
+
 .file-name {
     font-size: 0.9rem;
     color: var(--text-muted);
     margin: 10px 0;
 }
 
-/* Dashboard Content */
+/* --- DASHBOARD STATS --- */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -160,10 +172,11 @@ body {
 }
 
 .stat-card h2 {
-    color: var(--accent); /* Stats in Yellow */
+    color: var(--accent);
     margin: 10px 0 0 0;
 }
 
+/* --- MAIN DASHBOARD GRID --- */
 .main-grid {
     display: grid;
     grid-template-columns: 450px 1fr;
@@ -180,11 +193,13 @@ body {
 .card-header {
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border-color);
-    color: var(--primary); /* Header in Orange */
+    color: var(--primary);
+    font-weight: 700;
 }
 
+/* --- AI BOX & INSIGHTS --- */
 .ai-box {
-    background: rgba(255, 102, 0, 0.05); /* Very subtle orange tint */
+    background: rgba(255, 102, 0, 0.05);
     border: 1px solid var(--primary);
     padding: 1.2rem;
     margin: 1rem;
@@ -194,6 +209,12 @@ body {
 .ai-box h4 {
     color: var(--accent);
     margin: 0 0 10px 0;
+}
+
+#insightsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .insight-item {
@@ -211,35 +232,41 @@ body {
 }
 
 .insight-item strong {
-    color: var(--accent); /* AI Key points in Yellow */
+    color: var(--accent);
 }
 
-/* Charts Appearance */
+/* --- DYNAMIC CHART CARDS --- */
+.visuals-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
 .chart-container {
     background: #000;
     padding: 1rem;
     display: flex;
     justify-content: center;
-    min-height: 200px;
+    min-height: 250px;
 }
 
 .chart-container img {
     max-width: 100%;
-    max-height: 350px;
+    max-height: 380px;
     object-fit: contain;
-    filter: contrast(1.1); /* Make black-theme charts pop */
+    filter: contrast(1.05);
 }
 
 .chart-info {
     padding: 1rem;
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: #aaa;
     background: #080808;
-    line-height: 1.5;
+    line-height: 1.6;
     border-top: 1px solid var(--border-color);
 }
 
-/* Loading & Skeletons */
+/* --- LOADER & SKELETONS --- */
 .loader-container {
     text-align: center;
     padding: 3rem;
@@ -258,16 +285,14 @@ body {
     width: 50px;
     height: 50px;
     border: 5px solid rgba(255, 255, 255, 0.05);
-    border-top: 5px solid var(--accent); /* Yellow Spinner */
+    border-top: 5px solid var(--accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 2rem;
     box-shadow: 0 0 15px rgba(243, 255, 0, 0.2);
 }
 
-@keyframes spin {
-    100% { transform: rotate(360deg); }
-}
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 .skeleton {
     background: linear-gradient(110deg, #111111 8%, #222222 18%, #111111 33%);
@@ -276,60 +301,38 @@ body {
     border-radius: 10px;
 }
 
-@keyframes shimmer {
-    to { background-position-x: -200%; }
-}
+@keyframes shimmer { to { background-position-x: -200%; } }
 
-.skeleton-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
+.skeleton-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
 .sk-stat-card { height: 100px; }
-
-.skeleton-main {
-    display: grid;
-    grid-template-columns: 450px 1fr;
-    gap: 1.5rem;
-}
-
+.skeleton-main { display: grid; grid-template-columns: 450px 1fr; gap: 1.5rem; }
 .sk-insights { height: 600px; }
+.sk-chart { height: 380px; margin-bottom: 1.5rem; }
 
-.sk-chart {
-    height: 380px;
-    margin-bottom: 1.5rem;
-}
-
-
-/* For Chrome, Edge, Safari */
+/* --- CUSTOM SCROLLBARS --- */
 ::-webkit-scrollbar {
-  width: 6px;               /* thin scrollbar */
+    width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #121212;      /* dark background */
+    background: #050505;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2e2e2e;      /* thumb color */
-  border-radius: 10px;
+    background: #2e2e2e;
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;         /* hover effect */
+    background: var(--primary);
 }
 
-
-/* For Firefox */
 * {
-  scrollbar-width: thin;                /* thin */
-  scrollbar-color: #2e2e2e #121212;     /* thumb track */
+    scrollbar-width: thin;
+    scrollbar-color: #2e2e2e #050505;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #2e2e2e;
-  border-radius: 10px;
-  box-shadow: 0 0 5px rgba(255,255,255,0.1);
+/* Dashbaord Fade In */
+#dashboard {
+    transition: opacity 0.8s ease-in;
 }
