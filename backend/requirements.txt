@@ -1,0 +1,11 @@
+numpy
+pandas
+matplotlib
+seaborn
+fastapi 
+uvicorn
+python-multipart
+openpyxl
+xlrd
+groq
+python-dotenv
