@@ -1,1 +1,1 @@
-This is just a basic and inaccurate version of data analyzer and may fail anytime, usees groq api in v2
+This is just a basic and inaccurate version of data analyzer and may fail anytime, uses groq api in v2
